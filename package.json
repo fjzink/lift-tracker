@@ -1,0 +1,9 @@
+{
+  "name": "strength-tracker",
+  "version": "1.0.0",
+  "description": "Plan and track your strength training",
+  "main": "index.js",
+  "repository": "https://github.com/fjzink/strength-tracker.git",
+  "author": "Joey Zink",
+  "license": "MIT"
+}
