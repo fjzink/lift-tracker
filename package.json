@@ -8,7 +8,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node dist/server.js",
-    "build": "tsc",
+    "start:dev": "nodemon",
+    "build": "rimraf ./dist && tsc",
     "serve": "npm run build && npm run start",
     "lint": "eslint '*/**/*.{js,ts}' --quiet --fix"
   },
@@ -22,29 +23,23 @@
     "eslint-plugin-prettier": "^3.1.4",
     "husky": "^4.3.0",
     "lint-staged": "^10.4.0",
+    "nodemon": "^2.0.4",
     "prettier": "^2.1.2",
+    "rimraf": "^3.0.2",
+    "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
   },
   "dependencies": {
     "express": "^4.17.1"
   },
   "husky": {
-
     "hooks": {
-
-        "pre-commit": "lint-staged"
-
+      "pre-commit": "lint-staged"
     }
-
-},
-
-"lint-staged": {
-
+  },
+  "lint-staged": {
     "*.{js,ts,tsx}": [
-
-        "eslint --fix"
-
+      "eslint --fix"
     ]
-
-}
+  }
 }
