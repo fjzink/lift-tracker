@@ -1,9 +1,9 @@
 import express from 'express';
-
+import { client } from './config/mongoconfig';
 const app = express();
 const port = 3000;
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     res.send('The app is working :)');
 });
 
