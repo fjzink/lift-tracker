@@ -1,9 +1,10 @@
 import express from 'express';
-import { client } from './config/mongoconfig';
+import cors from 'cors';
 import { trainingSplitRouter } from './controllers/trainingSplitController';
 
 const app = express();
 const port = 3000;
+app.use(cors());
 
 app.use('/splits', trainingSplitRouter);
 
