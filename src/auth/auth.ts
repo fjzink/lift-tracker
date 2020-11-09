@@ -1,5 +1,7 @@
 import passport from 'passport';
 import { Strategy as localStrategy } from 'passport-local';
+import bcrypt from 'bcrypt';
+import { db } from '../server';
 
 passport.use(
     'signup',
@@ -10,9 +12,19 @@ passport.use(
             passReqToCallback: true,
         },
         async (req, email, password, done) => {
+            const { firstName, lastName } = req.body;
             try {
-                console.log(req.body);
-                done(null, req.body);
+                const hashedPassword = await bcrypt.hash(password, 10);
+                const user = {
+                    email,
+                    password: hashedPassword,
+                    firstName,
+                    lastName,
+                };
+                console.log(user);
+                const users = db.collection('users');
+                await users.insertOne(user);
+                done(null, user);
             } catch (error) {
                 done(error);
             }
@@ -26,11 +38,23 @@ passport.use(
         {
             usernameField: 'email',
             passwordField: 'password',
-            passReqToCallback: true,
         },
-        async (req, email, password, done) => {
+        async (email, password, done) => {
             try {
-                console.log(req.body);
+                const users = db.collection('users');
+                const user = await users.findOne({ email });
+
+                if (!user) {
+                    return done(null, false, { message: 'User not found' });
+                }
+
+                const validate = await bcrypt.compare(password, user.password);
+
+                if (!validate) {
+                    return done(null, false, { message: 'Wrong Password' });
+                }
+
+                return done(null, user, { message: 'Logged in Successfully' });
             } catch (error) {
                 return done(error);
             }
