@@ -6,20 +6,33 @@ import jwt from 'jsonwebtoken';
 const router = Router();
 const jsonParser = bodyParser.json();
 
-router.post(
-    '/signup',
-    jsonParser,
-    passport.authenticate('signup', { session: false }),
-    async (req: Request, res: Response) => {
-        res.send(req.body.email);
-    },
-);
+router.post('/signup', jsonParser, async (req: Request, res: Response, next: NextFunction) => {
+    passport.authenticate('signup', { session: false }, async (err, user, info) => {
+        try {
+            if (err || !user) {
+                const error = new Error('An error occurred.');
 
-router.post('/signin', jsonParser, async (req, res, next) => {
+                res.json({ error: info.message });
+
+                return next(error);
+            }
+
+            res.json({
+                message: 'Signup successful',
+            });
+        } catch (error) {
+            return next(error);
+        }
+    })(req, res, next);
+});
+
+router.post('/signin', jsonParser, async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('login', async (err, user, info) => {
         try {
             if (err || !user) {
                 const error = new Error('An error occurred.');
+
+                res.json({ error: info.message });
 
                 return next(error);
             }

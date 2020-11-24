@@ -1,6 +1,7 @@
 import passport from 'passport';
 import { Strategy as localStrategy } from 'passport-local';
 import bcrypt from 'bcrypt';
+import { Strategy as JWTstrategy, ExtractJwt as ExtractJWT } from 'passport-jwt';
 import { db } from '../server';
 
 passport.use(
@@ -13,6 +14,11 @@ passport.use(
         },
         async (req, email, password, done) => {
             const { firstName, lastName } = req.body;
+            const users = db.collection('users');
+            const userExists = await users.findOne({ email });
+            if (userExists) {
+                return done(null, false, { message: 'User already exists' });
+            }
             try {
                 const hashedPassword = await bcrypt.hash(password, 10);
                 const user = {
@@ -21,10 +27,8 @@ passport.use(
                     firstName,
                     lastName,
                 };
-                console.log(user);
-                const users = db.collection('users');
                 await users.insertOne(user);
-                done(null, user);
+                return done(null, user);
             } catch (error) {
                 done(error);
             }
@@ -51,7 +55,7 @@ passport.use(
                 const validate = await bcrypt.compare(password, user.password);
 
                 if (!validate) {
-                    return done(null, false, { message: 'Wrong Password' });
+                    return done(null, false, { message: 'Wrong password' });
                 }
 
                 return done(null, user, { message: 'Logged in Successfully' });
@@ -61,3 +65,21 @@ passport.use(
         },
     ),
 );
+
+passport.use(
+    new JWTstrategy(
+        {
+            secretOrKey: 'TOP_SECRET',
+            jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+        },
+        async (token, done) => {
+            try {
+                return done(null, token.user);
+            } catch (error) {
+                done(error);
+            }
+        },
+    ),
+);
+
+export { passport };
