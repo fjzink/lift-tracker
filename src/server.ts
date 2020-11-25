@@ -1,17 +1,16 @@
 import express from 'express';
 import cors from 'cors';
-import { Db, MongoClient } from 'mongodb';
+import { Db } from 'mongodb';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 if (process.env.NODE_ENV !== 'production') {
     dotenv.config();
 }
-import { trainingSplitRouter } from './controllers/trainingSplitController';
+import { trainingPlanRouter } from './controllers/trainingPlanController';
 import { authRouter } from './controllers/authController';
 import { dbClient } from './config/mongoconfig';
 
 import './auth/auth';
-import { passport } from './auth/auth';
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -30,7 +29,7 @@ dbClient.connect((err, database) => {
     });
 });
 
-app.use('/api/splits', trainingSplitRouter);
+app.use('/api/trainingplans', trainingPlanRouter);
 app.use('/api/auth', authRouter);
 
 app.get('/', async (req, res) => {

@@ -74,7 +74,7 @@ passport.use(
         },
         async (token, done) => {
             try {
-                return done(null, token.user);
+                return done(null, token.user, { user: token.user });
             } catch (error) {
                 done(error);
             }
